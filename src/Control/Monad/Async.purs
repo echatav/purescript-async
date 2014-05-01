@@ -27,12 +27,12 @@ foreign import apAsyncEff
   \        })();\
   \};};};}"
   :: forall a b eff.
-     (((a -> b) -> Eff eff {}) -> Eff eff {})
-  -> ((a -> Eff eff {}) -> Eff eff {})
-  -> (b -> Eff eff {})
-  -> Eff eff {}
+     (((a -> b) -> Eff (async | eff) {}) -> Eff (async | eff) {})
+  -> ((a -> Eff (async | eff) {}) -> Eff (async | eff) {})
+  -> (b -> Eff (async | eff) {})
+  -> Eff (async | eff) {}
 
-instance effAsync :: MonadAsync (Eff eff) where
+instance effAsync :: MonadAsync (Eff (async | eff)) where
  apAsync = apAsyncEff
 
 data Async m a = Async ((a -> m {}) -> m {})
