@@ -32,8 +32,7 @@ foreign import apAsync
   :: forall a b eff.
      (((a -> b) -> Eff (async :: Async | eff) {}) -> Eff (async :: Async | eff) {})
   -> ((a -> Eff (async :: Async | eff) {}) -> Eff (async :: Async | eff) {})
-  -> (b -> Eff (async :: Async | eff) {})
-  -> Eff (async :: Async | eff) {}
+  ->  (b -> Eff (async :: Async | eff) {}) -> Eff (async :: Async | eff) {}
 
 mapAsync :: forall a b eff.
             (a  -> ContT {} (Eff (async :: Async | eff))  b)
