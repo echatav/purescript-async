@@ -7,7 +7,7 @@ foreign import data Async :: !
 
 foreign import timeout
   "function timeout(t){return function(f){return function(){setTimeout(f,t);};};}"
-  :: forall a eff. Number -> Eff (async :: Async | eff) {} -> Eff (async :: Async | eff) {}
+  :: forall eff. Number -> Eff (async :: Async | eff) {} -> Eff (async :: Async | eff) {}
 
 timeoutCont :: forall eff. Number -> ContT {} (Eff (async :: Async | eff)) {}
 timeoutCont n = ContT (\k -> timeout n (k {}))
