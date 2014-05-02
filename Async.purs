@@ -6,7 +6,7 @@ import Control.Monad.Cont.Trans
 foreign import data Async :: !
 
 foreign import timeout
-  "function timeout(t){return function(f){return function(){setTimeout(f,t);};};}"
+  "function timeout(n){return function(f){return function(){setTimeout(f,n);};};}"
   :: forall eff. Number -> Eff (async :: Async | eff) {} -> Eff (async :: Async | eff) {}
 
 timeoutCont :: forall eff. Number -> ContT {} (Eff (async :: Async | eff)) {}
