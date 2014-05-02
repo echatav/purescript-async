@@ -18,12 +18,12 @@ foreign import apAsync
   \     return function(k){\
   \     return function( ){\
   \ var hf, hx;\
-  \ f(function(f1) {\
+  \ f(function(f1){\
   \  hf = f1;\
   \  if(hx){return k(hf(hx));}\
   \  else{return function(){};}\
   \ })();\
-  \ x(function(x1) {\
+  \ x(function(x1){\
   \  hx = x1;\
   \  if(hf){return k(hf(hx));}\
   \  else{return function(){};}\
