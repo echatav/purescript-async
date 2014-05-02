@@ -38,5 +38,5 @@ mapAsync :: forall a b eff.
             (a  -> ContT {} (Eff (async :: Async | eff))  b)
          -> [a] -> ContT {} (Eff (async :: Async | eff)) [b]
 mapAsync f [] = return []
-mapAsync f (a:as) = ((:) <$> (f a)) `ap` (mapAsync f as)
+mapAsync f (a:as) = ap ((:) <$> (f a)) (mapAsync f as)
  where ap (ContT g) (ContT x) = ContT (apAsync g x)
