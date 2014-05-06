@@ -4,8 +4,8 @@ import Async
 import Control.Monad.Eff
 
 foreign import ajax
-  "function ajax(url){\
-  \  return function(method){\
+  "function ajax(method){\
+  \  return function(url){\
   \    return function(headers){\
   \      return function(input){\
   \        return function(kErr){\
@@ -20,10 +20,19 @@ foreign import ajax
   \                          });\
   \};};};};};};}"
   :: forall headers input output eff.
-     String --URL
-  -> String --Method
+     String --Method
+  -> String --URL
   -> headers
   -> input
   -> (String -> Eff (async :: Async | eff) {}) --Error callback
   -> (output -> Eff (async :: Async | eff) {}) --Success callback
   -> Eff (async :: Async | eff) {}
+
+callProvider :: forall input output eff.
+                String --Action
+             -> input
+             -> (String -> Eff (async :: Async | eff) {}) --Error callback
+             -> (output -> Eff (async :: Async | eff) {}) --Success callback
+             -> Eff (async :: Async | eff) {}
+callProvider act = ajax "POST" ("/api/" ++ act) {"Cache-Control": "no-cache"}
+

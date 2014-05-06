@@ -2,15 +2,24 @@ module Async where
 
 import Control.Monad.Eff
 import Control.Monad.Cont.Trans
+import EitherContT
+import Debug.Trace
 
-foreign import data Async :: !
+foreign import data Async :: *
 
 foreign import timeout
   "var timeout=function(n){return function(f){return function(){setTimeout(f,n);};};}"
-  :: forall eff. Number -> Eff (async :: Async | eff) {} -> Eff (async :: Async | eff) {}
+  :: forall a eff. Number -> a -> Eff eff Async
 
-timeoutCont :: forall eff. Number -> ContT {} (Eff (async :: Async | eff)) {}
+timeoutCont :: forall eff. Number -> ContT Async (Eff eff) {}
 timeoutCont n = ContT (\k -> timeout n (k {}))
+
+foreign import traceAsync
+  "var traceAsync=function(x){return function(){console.log(x);};}"
+  :: forall eff. String -> Eff (trace :: Trace | eff) Async
+
+printAsync :: forall a eff. (Show a) => a -> Eff (trace :: Trace | eff) Async
+printAsync = traceAsync <<< show
 
 foreign import apAsync
   "var apAsync=function(f){\
@@ -30,13 +39,20 @@ foreign import apAsync
   \ })();\
   \};};};}"
   :: forall a b eff.
-     (((a -> b) -> Eff (async :: Async | eff) {}) -> Eff (async :: Async | eff) {})
-  -> ((   a     -> Eff (async :: Async | eff) {}) -> Eff (async :: Async | eff) {})
-  -> (    b     -> Eff (async :: Async | eff) {}) -> Eff (async :: Async | eff) {}
+     (((a -> b) -> Eff eff Async) -> Eff eff Async)
+  -> ((   a     -> Eff eff Async) -> Eff eff Async)
+  -> (    b     -> Eff eff Async) -> Eff eff Async
 
 mapAsync :: forall a b eff.
-            (a  -> ContT {} (Eff (async :: Async | eff))  b)
-         -> [a] -> ContT {} (Eff (async :: Async | eff)) [b]
+            (a  -> ContT Async (Eff eff)  b)
+         -> [a] -> ContT Async (Eff eff) [b]
 mapAsync f [] = return []
 mapAsync f (a:as) = ap ((:) <$> (f a)) (mapAsync f as)
  where ap (ContT g) (ContT x) = ContT (apAsync g x)
+
+mapEitherAsync :: forall a b b' eff.
+                  (b  -> EitherContT Async a (Eff eff)  b')
+               -> [b] -> EitherContT Async a (Eff eff) [b']
+mapEitherAsync f [] = return []
+mapEitherAsync f (b:bs) = ap ((:) <$> (f b)) (mapEitherAsync f bs)
+ where ap (EitherContT g) (EitherContT x) = EitherContT $ \kLeft -> apAsync (g kLeft) (x kLeft)
