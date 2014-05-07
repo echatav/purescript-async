@@ -24,13 +24,13 @@ throw :: forall r a m b. a -> EitherContT r a m b
 throw a = EitherContT $ \kLeft _ -> kLeft a
 
 instance bindEitherContT :: Bind (EitherContT r a m) where
-  (>>=) (EitherContT m) mf = EitherContT $
-    \kLeft kRight -> m kLeft (\b -> runEitherContT (mf b) kLeft kRight)
+  (>>=) (EitherContT m) mf = EitherContT $ \kLeft kRight ->
+    m kLeft (\b -> runEitherContT (mf b) kLeft kRight)
 
 --catch is bind for the left branch
 catch :: forall r m a a' b. EitherContT r a m b -> (a -> EitherContT r a' m b) -> EitherContT r a' m b
-catch (EitherContT tryer) catcher = EitherContT $
-  \kLeft kRight -> tryer (\a -> runEitherContT (catcher a) kLeft kRight) kRight
+catch (EitherContT tryer) catcher = EitherContT $ \kLeft kRight ->
+  tryer (\a -> runEitherContT (catcher a) kLeft kRight) kRight
 
 instance monadEitherContT :: Monad (EitherContT r a m)
 
