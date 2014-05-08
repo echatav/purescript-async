@@ -12,8 +12,8 @@ instance functorEitherContT :: Functor (EitherContT r a m) where
   (<$>) f (EitherContT m) = EitherContT $ \kLeft kRight -> m kLeft (kRight <<< f)
 
 instance applyEitherContT :: Apply (EitherContT r a m) where
-  (<*>) (EitherContT f) (EitherContT v) = EitherContT $
-    \kLeft kRight -> f kLeft $ \g -> v kLeft (kRight <<< g)
+  (<*>) (EitherContT f) (EitherContT v) = EitherContT $ \kLeft kRight ->
+    f kLeft $ \g -> v kLeft (kRight <<< g)
 
 instance applicativeEitherContT :: Applicative (EitherContT r a m) where
   pure b = EitherContT $ \_ kRight -> kRight b
