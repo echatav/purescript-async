@@ -6,11 +6,10 @@ data EitherContT r a m b = EitherContT ((a -> m r) -> (b -> m r) -> m r)
 --Church encoding, EitherT a m b ~ forall r. EitherContT r a m b
 
 runEitherContT :: forall r a m b. EitherContT r a m b -> (a -> m r) -> (b -> m r) -> m r
-runEitherContT (EitherContT eitherCont) = eitherCont
+runEitherContT (EitherContT m) = m
 
 instance functorEitherContT :: Functor (EitherContT r a m) where
-  (<$>) f (EitherContT m) = EitherContT $
-    \kLeft kRight -> m kLeft (kRight <<< f)
+  (<$>) f (EitherContT m) = EitherContT $ \kLeft kRight -> m kLeft (kRight <<< f)
 
 instance applyEitherContT :: Apply (EitherContT r a m) where
   (<*>) (EitherContT f) (EitherContT v) = EitherContT $
